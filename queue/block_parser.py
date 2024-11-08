@@ -5,7 +5,7 @@ import re
 class Block(object):
     def __init__(self):
         self.values = dict()
-        self.values['name'] = 'unknown-job'  # Corrected typo from 'unkown-job' to 'unknown-job'
+        self.values['name'] = 'unknown-job'
         self.values['threads'] = 1
         self.values['memory'] = 1024
         self.values['gpus'] = 0
@@ -17,10 +17,10 @@ class Block(object):
         try:
             for key in ['name', 'threads', 'memory', 'gpus', 'hours', 'subtasks']:
                 original_value = self.values[key]
-                if isinstance(self.values[key], int):
-                    self.values[key] = max(1, self.values[key])
-                elif key == 'gpus':
-                    self.values[key] = max(0, self.values[key])
+                if key in ['threads', 'memory', 'gpus', 'hours', 'subtasks']:
+                    self.values[key] = max(1, int(self.values[key]))
+                    if key == 'gpus':
+                        self.values[key] = max(0, int(self.values[key]))  # GPUs can be zero
                 else:
                     self.values[key] = str(self.values[key])
                 print(f"Checked {key}: converted from {original_value} to {self.values[key]}")
@@ -44,9 +44,10 @@ class Block_Parser(object):
         self.blocks = []
 
     def _parse_block(self, block):
-        block[0] = re.sub('gpu=true', 'gpus=1', block[0])
-        block[0] = re.sub('gpu=false', 'gpus=0', block[0])
-        meta = re.sub('\\).*', '', re.sub('.*\\(', '', block[0])).split(',')
+        header = block[0]
+        header = re.sub('gpu=true', 'gpus=1', header)
+        header = re.sub('gpu=false', 'gpus=0', header)
+        meta = re.sub('\\).*', '', re.sub('.*\\(', '', header)).split(',')
         parsed_block = Block()
         for param in meta:
             key, value = param.split('=')
@@ -54,6 +55,7 @@ class Block_Parser(object):
             value = value.strip()
             if parsed_block.exists(key):
                 parsed_block.set_value(key, value)
+        # Assigning remaining lines after the header as the script
         parsed_block.set_value('script', block[1:])
         parsed_block.check()
         return parsed_block
@@ -61,7 +63,7 @@ class Block_Parser(object):
     def parse(self, script):
         try:
             f = open(script, 'r')
-            content = f.read().split('\\n')
+            content = f.read().split('\n')  # Changed '\\n' to '\n'
             f.close()
         except Exception as e:
             print(f'Parser: script {script} could not be opened. Error: {str(e)}')
@@ -71,17 +73,15 @@ class Block_Parser(object):
         for i, line in enumerate(content):
             if line.startswith('#block'):
                 block_starts.append(i)
-        block_starts.append(len(content))
+        block_starts.append(len(content))  # To include the last block correctly
         blocks = []
         for i in range(len(block_starts) - 1):
-            blocks.append(content[block_starts[i]:block_starts[i + 1]])
+            block = content[block_starts[i]:block_starts[i + 1]]
+            blocks.append(self._parse_block(block))
         if not blocks:
             print(f'Error: No block defined in {script}')
             exit()
-        parsed_blocks = []
-        for block in blocks:
-            parsed_blocks.append(self._parse_block(block))
-        return parsed_blocks
+        return blocks
 
 # Uncomment to test parsing
 # p = Block_Parser()
