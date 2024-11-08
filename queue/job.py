@@ -56,7 +56,7 @@ class Executable_Job(Job):
         if self.qlog == None:
             print(msg)
         else:
-            self.qlog.write(msg + '\n')
+            self.qlog.write(msg + '\\n')
             self.qlog.flush()
 
 
@@ -125,10 +125,10 @@ class Executable_Job(Job):
         # create script file
         self.tmp_script_file = '.' + self.name + '.' + str(self.job_id)
         with open(self.tmp_script_file, 'w') as f:
-            f.write('#!/bin/bash\n')
-            f.write('export N_SUBTASKS=' + str(self.requests['subtasks']) + '\n')
-            f.write('export SUBTASK_ID=' + str(self.subtask_id+1) + '\n')
-            f.write('\n'.join(self.requests['script']))
+            f.write('#!/bin/bash\\n')
+            f.write('export N_SUBTASKS=' + str(self.requests['subtasks']) + '\\n')
+            f.write('export SUBTASK_ID=' + str(self.subtask_id+1) + '\\n')
+            f.write('\\n'.join(self.requests['script']))
             f.close()
         cmd = ''
         # memory limit
@@ -141,7 +141,7 @@ class Executable_Job(Job):
         # script
         cmd = cmd + 'bash ' + self.tmp_script_file + ' ' + ' '.join(script_params)
         # send finalize message via tcp
-        cmd = cmd + '; bash -c "echo finished:' + str(self.job_id) \
+        cmd = cmd + '; bash -c "echo finished:' + str(self.job_id) \\
             + ' > /dev/tcp/' + self.server_address[0] + '/' + str(self.server_address[1]) + '"'
         # run job without waiting
         proc = subprocess.Popen(args=cmd, stdout=self.qlog, stderr=self.qlog, shell=True, preexec_fn=os.setsid)
@@ -158,7 +158,7 @@ class Executable_Job(Job):
             received = connection.recv(1024)
             if (received == 'delete') or (received == 'timeout'):
                 if self.is_running:
-                    self.write_log('\nJOB KILLED: %s\n' % received)
+                    self.write_log('\\nJOB KILLED: %s\\n' % received)
                     os.killpg(os.getpgid(pid), signal.SIGKILL)
                     return
                 else:
@@ -206,7 +206,7 @@ def main():
     # parse arguments
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('script', type=str, nargs='+',
-                            help='script (plus its parameters) to be submitted. Script parameters must not start with \'-\'. If they'
+                            help='script (plus its parameters) to be submitted. Script parameters must not start with \\-. If they'
                                   ' do so, pass them with quotation marks and a leading space, e.g. " --foo".')
     arg_parser.add_argument('--server_ip', type=str, default='localhost', help='ip address of the server')
     arg_parser.add_argument('--server_port', type=int, default=1234, help='port of the server')
