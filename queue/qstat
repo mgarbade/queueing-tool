@@ -14,13 +14,21 @@ def main():
 
     server_address = (args.server_ip, args.server_port)
     verbose = 'verbose' if args.verbose else 'quiet'
+    
+    print(f"Attempting to connect to {args.server_ip} on port {args.server_port}")
 
     try:
-        sock = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
-        sock.settimeout(10.0)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(10.0)  # Timeout for socket operations like connect
+        print("Socket created, setting timeout to 10 seconds.")
+
         sock.connect(server_address)
-        sock.sendall('qstat:' + verbose)
-        # print(header
+        print("Connection established.")
+
+        request_message = 'qstat:' + verbose
+        sock.sendall(request_message.encode())  # Ensure string is encoded to bytes
+        print(f"Sent data: {request_message}")
+
         if not args.verbose:
             print('+----------------------------------------------------------------------------+')
             print('|id               jobname    submit/start time  status         user  priority|')
@@ -29,20 +37,25 @@ def main():
             print('+-----------------------------------------------------------------------------------------------------------------+')
             print('|id               jobname    submit/start time  status         user  priority  threads    memory  time limit  gpus|')
             print('+-----------------------------------------------------------------------------------------------------------------+')
-        # print(jobs
-        reply = sock.recv(1024)
-        while not reply == '':
-            print(reply)
-            sock.sendall('ack') # send acknowledgement
-            reply = sock.recv(1024)
-        sock.close()
-        # print(footer
+
+        reply = sock.recv(1024).decode()  # Decode bytes back to string
+        while reply:
+            print(f"Received: {reply}")
+            sock.sendall('ack'.encode())  # Send acknowledgement
+            reply = sock.recv(1024).decode()
+        
+
+
         if not args.verbose:
             print('+----------------------------------------------------------------------------+')
         else:
             print('+-----------------------------------------------------------------------------------------------------------------+')
-    except:
-        print('qstat: no answer from server')
+    
+        print("All data received. Closing socket.")
+        sock.close()
+
+    except Exception as e:
+        print(f'qstat: no answer from server - Error: {e}')
 
 
 if __name__ == '__main__':
