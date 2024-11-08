@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3
 
 import socket
 import os
@@ -37,7 +37,7 @@ def main():
                 else:
                     joblist.append(int(job))
         except:
-            print 'qdel: ' + ' '.join(args.jobs) + ' is not a valid list of job ids.'
+            print('qdel: ' + ' '.join(args.jobs) + ' is not a valid list of job ids.')
             exit()
 
     server_address = (args.server_ip, args.server_port)
@@ -56,11 +56,11 @@ def main():
             reply = sock.recv(1024)
             while reply != ':' and reply != '':
                 sock.sendall(':') # send acknowledgement to server
-                print reply
+                print(reply)
                 reply = sock.recv(1024)
         sock.close()
     except:
-        print 'qdel: no answer from server'
+        print('qdel: no answer from server')
 
 if __name__ == '__main__':
     main()

@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3
 
 import socket
 import argparse
@@ -20,29 +20,29 @@ def main():
         sock.settimeout(10.0)
         sock.connect(server_address)
         sock.sendall('qstat:' + verbose)
-        # print header
+        # print(header
         if not args.verbose:
-            print '+----------------------------------------------------------------------------+'
-            print '|id               jobname    submit/start time  status         user  priority|'
-            print '+----------------------------------------------------------------------------+'
+            print('+----------------------------------------------------------------------------+')
+            print('|id               jobname    submit/start time  status         user  priority|')
+            print('+----------------------------------------------------------------------------+')
         else:
-            print '+-----------------------------------------------------------------------------------------------------------------+'
-            print '|id               jobname    submit/start time  status         user  priority  threads    memory  time limit  gpus|'
-            print '+-----------------------------------------------------------------------------------------------------------------+'
-        # print jobs
+            print('+-----------------------------------------------------------------------------------------------------------------+')
+            print('|id               jobname    submit/start time  status         user  priority  threads    memory  time limit  gpus|')
+            print('+-----------------------------------------------------------------------------------------------------------------+')
+        # print(jobs
         reply = sock.recv(1024)
         while not reply == '':
-            print reply
+            print(reply)
             sock.sendall('ack') # send acknowledgement
             reply = sock.recv(1024)
         sock.close()
-        # print footer
+        # print(footer
         if not args.verbose:
-            print '+----------------------------------------------------------------------------+'
+            print('+----------------------------------------------------------------------------+')
         else:
-            print '+-----------------------------------------------------------------------------------------------------------------+'
+            print('+-----------------------------------------------------------------------------------------------------------------+')
     except:
-        print 'qstat: no answer from server'
+        print('qstat: no answer from server')
 
 
 if __name__ == '__main__':

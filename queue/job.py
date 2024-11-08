@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3
 
 import subprocess
 import threading
@@ -54,7 +54,7 @@ class Executable_Job(Job):
 
     def write_log(self, msg):
         if self.qlog == None:
-            print msg
+            print(msg)
         else:
             self.qlog.write(msg + '\n')
             self.qlog.flush()
@@ -189,12 +189,12 @@ class Executable_Job(Job):
             reply = sock.recv(1024)
             sock.close()
         except:
-            print 'register job: no answer from server'
+            print('register job: no answer from server')
             exit()
-        # if declined print decline message and exit
+        # if declined print(decline message and exit
         if not reply == 'accept':
-            print 'JOB DECLINED.'
-            print reply
+            print('JOB DECLINED.')
+            print(reply)
             exit()
 
 

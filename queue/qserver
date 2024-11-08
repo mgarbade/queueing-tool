@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3
 
 import socket
 import time
@@ -217,7 +217,7 @@ class Server(object):
                 msg = connection.recv(1024)
                 assert msg != ''
                 specifier = msg.split(':')[0]
-                to_delete = re.sub('\*', '.*', msg.split(':')[1])
+                to_delete = re.sub('\\*', '.*', msg.split(':')[1])
                 user = msg.split(':')[2]
                 joblist = []
                 # find relevant jobs
@@ -268,10 +268,10 @@ class Server(object):
                 self.next_job_id = max(1, (self.next_job_id + 1) % 10000000)
             elif msg == 'qdel': # delete job
                 self.qdel(connection)
-            elif msg[0:5] == 'qstat': # print queue
+            elif msg[0:5] == 'qstat': # print(queue
                 verbose = True if msg.split(':')[1] == 'verbose' else False
                 self.qstat(connection, verbose)
-            elif msg == 'qinfo': # print resource information
+            elif msg == 'qinfo': # print(resource information
                 self.qinfo(connection)
         except:
             return

@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3
 
 import argparse
 import os
@@ -31,7 +31,7 @@ def request_id(server_address):
         job_id = int( sock.recv(1024) )
         sock.close()
     except:
-        print 'request id: no answer from server'
+        print('request id: no answer from server')
         exit()
     return job_id
 
@@ -61,7 +61,7 @@ def select_blocks(script, start_block, only_start_block = False):
             else:
                 start_idx = start_idx + 1
     if start_idx >= len(blocks):
-        print 'block name ' + start_block + ' does not exist. Do not submit jobs.'
+        print('block name ' + start_block + ' does not exist. Do not submit jobs.')
         exit()
     # return the relevant blocks
     if only_start_block:
@@ -99,7 +99,7 @@ def main():
             assert subtask_id <= blocks[block_indices[0]].values['subtasks']
             assert subtask_id > 0
         except:
-            print 'block ' + args.subtask[0] + ': subtask id must be in the range 1,...,' + str(blocks[block_indices[0]].values['subtasks']) + ' but is ' + args.subtask[1]
+            print('block ' + args.subtask[0] + ': subtask id must be in the range 1,...,' + str(blocks[block_indices[0]].values['subtasks']) + ' but is ' + args.subtask[1])
             exit()
     elif not args.from_block == '':
         blocks, block_indices = select_blocks(args.script[0], args.from_block, False)
